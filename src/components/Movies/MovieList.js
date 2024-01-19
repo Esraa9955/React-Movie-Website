@@ -1,21 +1,41 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useEffect, useState } from "react";
 
 import { axiosInstance } from "../../apis/config";
 import MovieCard from "./MovieCard";
+import LanguageContext from "../../context/language";
 console.log(axiosInstance);
 
 const MovieList = () => {
   const [movies, setMovies] = useState([]);
   //const [searchQuery, setSearchQuery] = useState('');
+  const {language}=useContext(LanguageContext)
+//useEffect(() => {
+//   axiosInstance
+//      .get("/movie/popular", {
+//        params: { api_key: "1dd63b0f63b136e626a91725c3f5d3a0" },
+//      })
+//      .then((res) =>{console.log(res.data.results); setMovies((res.data.results))})
+//      .catch((err) => console.log(err));
+//  }, []);*
+
   useEffect(() => {
-    axiosInstance
-      .get("/movie/popular", {
-        params: { api_key: "1dd63b0f63b136e626a91725c3f5d3a0" },
-      })
-      .then((res) =>{console.log(res.data.results); setMovies((res.data.results))})
-      .catch((err) => console.log(err));
-  }, []);
+    const fetchMovies = async () => {
+      try {
+        const response = await axiosInstance.get('/movie/popular', {
+          params: {
+            api_key: '1dd63b0f63b136e626a91725c3f5d3a0',
+            language: language,
+          },
+        });
+        setMovies(response.data.results);
+      } catch (error) {
+        console.error('Error fetching popular movies:', error);
+      }
+    };
+
+    fetchMovies();
+  }, [language]);
   return (
     <>
       <h1>Popular Movie</h1>

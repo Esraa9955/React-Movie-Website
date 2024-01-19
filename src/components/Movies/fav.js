@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import { Link } from 'react-router-dom';
 //import { useParams, useLocation } from 'react-router-dom';
 import { axiosInstance } from '../../apis/config';
@@ -6,24 +6,41 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch } from 'react-redux';
 import {removeFromFavorites} from '../../slices/favoritesSlice'
-
+import LanguageContext from '../../context/language';
 const Fav = ({ favorite }) => {
   const [movieDetails, setMovieDetails] = useState({});
+  const { language } = useContext(LanguageContext);
   //const params = useParams();
   //const location = useLocation();
 
-  useEffect(() => {
-    axiosInstance
-      .get(`/movie/${favorite.id}`, {
-        params: { api_key: "1dd63b0f63b136e626a91725c3f5d3a0" },
-      })
-      .then((res) => {
-        console.log(res.data);
-        setMovieDetails(res.data);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+//  useEffect(() => {
+//    axiosInstance
+//      .get(`/movie/${favorite.id}`, {
+//        params: { api_key: "1dd63b0f63b136e626a91725c3f5d3a0" },
+//      })
+//      .then((res) => {
+//        console.log(res.data);
+//        setMovieDetails(res.data);
+//      })
+//      .catch((err) => console.log(err));
+//  }, []);
+useEffect(() => {
+  const fetchMovieDetails = async () => {
+    try {
+      const response = await axiosInstance.get(`/movie/${favorite.id}`, {
+        params: {
+          api_key: '1dd63b0f63b136e626a91725c3f5d3a0',
+          language: language,
+        },
+      });
+      setMovieDetails(response.data);
+    } catch (error) {
+      console.error('Error fetching movie details:', error);
+    }
+  };
 
+  fetchMovieDetails();
+}, [favorite.id, language]);
 
     const dispatch=useDispatch();
   const removeFromfavoritesHandler=(movieDetails)=>{
